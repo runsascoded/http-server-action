@@ -36,6 +36,7 @@ function deploy(config, ready) {
     }
 
     server.on('request', (request, response) => {
+        console.log("request.url:", request.url)
         if (config.noCache) {
             response.setHeader(
                 'Cache-Control',
@@ -54,6 +55,7 @@ function deploy(config, ready) {
         }
         const url = new URL(request.url, `http://${request.headers.host}`);
         let requestedFile = path.resolve(path.normalize(path.join(cwd, ...url.pathname.split(path.posix.sep))));
+        console.log(`requestedFile:`, requestedFile)
         if (requestedFile !== root) {
             if (!requestedFile.startsWith(cwd)) {
                 const body = 'Not Found';
@@ -77,6 +79,7 @@ function deploy(config, ready) {
         }
 
         let stat = fs.statSync(requestedFile);
+        console.log("stat:", stat)
 
         if (stat.isDirectory()) {
             if (!requestedFile.endsWith(path.sep)) {
@@ -101,6 +104,7 @@ function deploy(config, ready) {
                     response.end();
                     return;
                 }
+                console.log(`Writing directory listing for ${requestedFile}`)
                 response.write('<pre>\n');
 
                 let parentDir = path.resolve(path.normalize(path.join(requestedFile, '..')));
